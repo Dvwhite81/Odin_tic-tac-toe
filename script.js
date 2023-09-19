@@ -1,48 +1,74 @@
-const gameGrid = (() => {
-    // const grid = new Array(9).fill('');
-    const grid = ['', 'X', '', 'O', '', '', '', '', '']
+const Player = (symbol) => {
+    return symbol;
+};
 
-    const resetGrid = () => {
-        for (let i = 0; i < grid.length; i++) {
-            grid[i] = '';
+const Gameboard = (() => {
+    const grid = ['X', '', '', '', 'O', '', '', '', ''];
+    const htmlGrid = [];
+    const container = document.querySelector('.gameboard');
+
+    const getSymbol = (index, symbol) => {
+        if (symbol === 'X') {
+            return `
+                <img id="${index}" src="./images/x-symbol.png">
+            `;
         }
+        else if (symbol === 'O') {
+            return `
+                <img id="${index}" src="./images/o-symbol.png">
+            `
+        }
+        else return '';
     }
 
-    const setSpace = (index, mark) => {
-        grid[index] = mark;
+    const createBoard = () => {
+        let html = '';
+        grid.forEach((symbol, index) => {
+            const imgSymbol = getSymbol(index, symbol);
+
+            html += `
+                <div class="square" data-id="${index}">${imgSymbol}</div>
+            `;
+        });
+
+        container.innerHTML = html;
+
+        const squares = document.querySelectorAll('.square');
+        squares.forEach(square => {
+            square.addEventListener('click', Game.addMark)
+        })
     }
 
-    const getSpace = (index) => {
-        return grid[index];
-    }
-
-    return {resetGrid, setSpace, getSpace};
+    return {grid, createBoard};
 })();
 
-const Player = (symbol) => {
+const Game = (() => {
+    let players;
+    let currentPlayer;
+    console.log('Game', currentPlayer)
+    let gameOver = false;
 
-    const getSymbol = () => {
-        return symbol;
+    const start = () => {
+        const human = Player('X');
+        const computer = Player('O');
+        players = [human, computer];
+        currentPlayer = human;
+
+        Gameboard.createBoard();
     }
 
-    return {getSymbol};
-}
+    const addMark = (e) => {
+        const id = e.target.dataset.id;
 
-const squares = document.getElementsByClassName('square');
-for (let i = 0; i < 9; i++) {
-    const square = squares[i];
-
-    let symbol;
-    if (gameGrid.getSpace(i) === '') {
-        // nothing
+        Gameboard.grid[id] = currentPlayer;
+        Gameboard.createBoard();
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
     }
-    else {
-        const img = document.createElement('img');
 
-        if (gameGrid.getSpace(i) === 'X') symbol = './images/x-symbol.png';
-        else if (gameGrid.getSpace(i) === 'O') symbol = './images/o-symbol.png';
+    return {start, addMark};
+})();
 
-        img.setAttribute('src', symbol);
-        square.appendChild(img);
-    }
-}
+const startBtn = document.getElementById('startBtn');
+startBtn.addEventListener('click', () => {
+    Game.start();
+});
