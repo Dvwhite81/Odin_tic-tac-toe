@@ -9,16 +9,46 @@
 </head>
 <body>
     <div class="container">
-        <button id="startBtn">Start</button>
+        <div id="start-container">
+            <h1>Welcome!</h1>
+            <h2>Let's Play Tic-Tac-Toe</h2>
+            <button id="start-btn">Start</button>
+        </div>
 
         <div id="gameboard" class="gameboard small"></div>
 
         <!-- Modal -->
-        <div id="myModal" class="modal">
+        <div id="startModal" class="modal modal-flex small">
             <div class="modal-content">
-                <span class="close">&times;</span>
-                <h1 id="winner-heading"></h1>
-                <button class="new-game-btn">New Game</button>
+                <div class="input-container">
+                    <label class="input-container name-label">
+                        Name?
+                        <input class="input-container" type="text" name="user-name" id="user-name">
+                      </label>
+                      <div class="radio-container">
+                        <label class="input-container">
+                            X
+                            <input type="radio" name="radio">
+                            <span class="checkmark"></span>
+                          </label>
+                          <label class="input-container">
+                            O
+                            <input type="radio" name="radio">
+                            <span class="checkmark"></span>
+                          </label>
+                      </div>
+
+                </div>
+                <div class="button-container">
+                    <button class="start-game-btn">Play</button>
+                </div>
+            </div>
+        </div>
+        <div id="endModal" class="modal modal-flex small">
+            <div class="modal-content">
+                <span class="close-modal-btn">&times;</span>
+                <h1 id="end-heading"></h1>
+                <button class="end-game-btn">New Game</button>
             </div>
         </div>
     </div>

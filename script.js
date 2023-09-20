@@ -1,5 +1,5 @@
-const Player = (symbol) => {
-  return symbol;
+const Player = (name, symbol) => {
+  return { name, symbol };
 };
 
 const Gameboard = (() => {
@@ -35,24 +35,46 @@ const Gameboard = (() => {
     });
   };
 
-  return { grid, createBoard };
+  const removeListeners = () => {
+    const squares = document.querySelectorAll(".square");
+    squares.forEach((square) =>
+      square.removeEventListener("click", Game.addMark)
+    );
+  };
+
+  return { grid, createBoard, removeListeners };
 })();
 
 const Game = (() => {
   let currentPlayer;
-  console.log("Game", currentPlayer);
+  let players;
 
-  const start = () => {
-    const human = Player("X");
-    const computer = Player("O");
+  const setPlayers = (a, b) => {
+    players = [a, b];
+  };
+
+  const switchPlayers = () => {
+    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+  };
+
+  const getPlayerName = () => {
+    return players[0];
+  };
+
+  const start = (userName) => {
+    const popup = document.getElementById('startModal');
+    console.log('start - classlist:', popup.classList)
+    console.log('start')
+    const human = Player(userName, "X");
+    const computer = Player("The Computer", "O");
     currentPlayer = human;
-
+    setPlayers(human, computer);
     Gameboard.createBoard();
   };
 
   const checkWin = () => {
     let winner = "";
-    if (Gameboard.grid.filter(elem => elem === '').length === 0) {
+    if (Gameboard.grid.filter((elem) => elem === "").length === 0) {
       winner = "Tie";
     }
 
@@ -73,7 +95,7 @@ const Game = (() => {
 
     // End game
     if (winner !== "") {
-      endGame(winner);
+      endGame(currentPlayer.name);
     }
   };
 
@@ -81,14 +103,18 @@ const Game = (() => {
     const id = e.target.dataset.id;
 
     if (Gameboard.grid[id] === "") {
-      Gameboard.grid[id] = currentPlayer;
-      currentPlayer = currentPlayer === "X" ? "O" : "X";
+      Gameboard.grid[id] = currentPlayer.symbol;
+      Gameboard.createBoard();
+      checkWin();
+      switchPlayers();
+    } else {
+      alert("Choose an empty space");
     }
-    Gameboard.createBoard();
-    checkWin();
   };
 
   const endGame = (winner) => {
+    console.log('endgame')
+    Gameboard.removeListeners();
     Gameboard.grid = ["", "", "", "", "", "", "", "", ""];
 
     let msg = "";
@@ -97,60 +123,95 @@ const Game = (() => {
     } else {
       msg = `${winner} wins!`;
     }
-    Modal.openModal(msg);
+    const modal = Modal("end");
+    modal.openModal("end", msg);
     winner = "";
   };
 
   const startGame = () => {
-    console.log("startGame", Gameboard.grid);
-    const startBtn = document.getElementById("startBtn");
+    console.log('startgame')
+    const popup = document.getElementById('startModal');
+    console.log('startgame 1 - classlist:', popup.classList)
+    const startBtn = document.getElementById("start-btn");
     startBtn.addEventListener("click", () => {
-      const container = document.querySelector(".gameboard");
-      container.classList.remove("small");
-      container.classList.add("grow");
-      startBtn.classList.add("small");
-      startBtn.remove();
-      Game.start();
+      const modal = Modal("start");
+      modal.openModal("start");
+      const popup = document.getElementById('startModal');
+      console.log('startgame 2 - classlist:', popup.classList)
+      const startModal = document.getElementById('startModal');
     });
   };
 
-  const newGame = () => {
-    Modal.closeModal();
-    Game.start();
-  };
+  const getUserName = () => {
+    let popup = document.getElementById('startModal');
+    console.log('getusername 1 - classlist:', popup.classList)
+    console.log('players', players)
 
-  return { start, addMark, startGame, newGame };
-})();
-
-const Modal = (() => {
-  const popup = document.getElementById("myModal");
-  const span = document.getElementsByClassName("close")[0];
-  const newGameBtn = document.querySelector(".new-game-btn");
-
-  const openModal = (msg) => {
-    console.log("openModal", Gameboard.grid);
-    const h1 = document.getElementById("winner-heading");
-    h1.textContent = msg;
-    popup.classList.add("modal-flex");
-  };
-
-  const closeModal = (e, outsideClick) => {
-    if (outsideClick) {
-      if (e.target.classList.contains("modal")) {
-        popup.classList.remove("modal-flex");
-        popup.classList.add("modal-none");
-      }
+    if (players !== undefined) {
+        let popup = document.getElementById('startModal');
+        console.log('getusername - 2 - classlist:', popup.classList)
+        console.log('players[0]', players[0])
+        console.log('players[0].name', players[0].name)
+        Game.newGame(players[0].name);
     } else {
-      popup.classList.remove("modal-flex");
-      popup.classList.add("modal-none");
+        const input = document.getElementById("user-name");
+        const userName = input.value;
+        const container = document.querySelector(".gameboard");
+        container.classList.remove("small");
+        container.classList.add("grow");
+        const startContainer = document.getElementById("start-container");
+        startContainer.classList.add("small");
+        startContainer.remove();
+        let popup = document.getElementById('startModal');
+        console.log('getusername - 3 - classlist:', popup.classList)
+
+        Game.newGame(userName);
+        popup = document.getElementById('startModal');
+        console.log('getusername - 4 - classlist:', popup.classList)
+
     }
   };
 
-  popup.addEventListener("click", (e) => closeModal(e, true));
-  span.addEventListener("click", closeModal);
-  newGameBtn.addEventListener("click", Game.newGame);
+  const newGame = (userName) => {
+    console.log('newgame')
+    const modal = Modal("end");
+    modal.closeModal();
+    Game.start(userName);
+  };
+
+  return { start, addMark, startGame, newGame, getUserName, getPlayerName };
+})();
+
+const Modal = (type) => {
+  const popup = document.getElementById(`${type}Modal`);
+  const span = document.querySelector(".close-modal-btn");
+  const modalSubmitBtn = document.querySelector(`.${type}-game-btn`);
+
+  const openModal = (type, msg) => {
+    if (type === "start") {
+    } else {
+      const h1 = document.getElementById(`${type}-heading`);
+      h1.textContent = msg;
+    }
+    console.log('openmodal 1',popup.classList)
+    console.log('openmodal 2', popup.classList)
+
+
+    popup.classList.add('grow')
+    console.log('openmodal 3', popup.classList)
+
+  };
+
+  const closeModal = () => {
+    popup.classList.remove("grow");
+  };
+
+  modalSubmitBtn.addEventListener("click", () => {
+    closeModal();
+    Game.getUserName();
+  });
 
   return { openModal, closeModal };
-})();
+};
 
 Game.startGame();

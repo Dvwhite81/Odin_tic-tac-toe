@@ -1,11 +1,13 @@
 * {
     box-sizing: border-box;
+    font-family: monospace, sans-serif;
     margin: 0;
     padding: 0;
 }
 
 .container {
     align-items: center;
+    background-color: antiquewhite;
     display: grid;
     height: 100vh;
     justify-content: center;
@@ -52,7 +54,7 @@ h1 {
 }
 
 .square:hover {
-    background-color: blue;
+    background-color: darkcyan;
     cursor: pointer;
 }
 
@@ -61,10 +63,16 @@ h1 {
     width: 80%;
 }
 
-button#startBtn,
-.new-game-btn {
+div#start-container {
+    display: grid;
+    text-align: center;
+}
+
+button#start-btn,
+.start-game-btn,
+.end-game-btn {
     align-items: center;
-    background-color: green;
+    background-color: #F9A03F;
     border-radius: 50%;
     color: white;
     display: flex;
@@ -76,8 +84,17 @@ button#startBtn,
     width: 4rem;
 }
 
+button#start-btn {
+    position: fixed;
+    top: 30%;
+    height: 20%;
+    width: 20%;
+    font-size: x-large;
+}
+
 .modal {
     background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 20%;
     display: none;
     justify-self: center;
     height: 100%;
@@ -88,30 +105,33 @@ button#startBtn,
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: #F7D488;
     border: 1px solid #888;
+    border-radius: 20%;
     display: flex;
     flex-direction: column;
-    height: 80%;
-    margin: auto;
-    width: 80%;
+    height: 100%;
+    width: 100%;
 }
 
-.close {
+.close-modal-btn {
     color: #aaa;
-    float: right;
     font-size: 28px;
+    position: relative;
     font-weight: bold;
+    top: 5%;
+    left: 10%;
 }
 
-.close:hover,
-.close:focus {
+.close-modal-btn:hover,
+.close-modal-btn:focus {
     color: black;
     cursor: pointer;
     text-decoration: none;
 }
 
-.new-game-btn {
+.start-game-btn,
+.end-game-btn {
     height: 5rem;
     margin: auto;
     width: 5rem;
@@ -123,4 +143,91 @@ button#startBtn,
 
 .modal-flex {
     display: flex;
+}
+
+.input-container {
+    display: grid;
+    position: relative;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Hide the browser's default radio button */
+  .input-container input[type=radio] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  /* Create a custom radio button */
+  .checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 25px;
+    width: 25px;
+    background-color: #eee;
+    border-radius: 50%;
+  }
+
+  /* On mouse-over, add a grey background color */
+  .input-container:hover input ~ .checkmark {
+    background-color: #ccc;
+  }
+
+  /* When the radio button is checked, add a blue background */
+  .input-container input:checked ~ .checkmark {
+    background-color: #F9A03F;
+  }
+
+  /* Create the indicator (the dot/circle - hidden when not checked) */
+  .checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+  }
+
+  /* Show the indicator (dot/circle) when checked */
+  .input-container input:checked ~ .checkmark:after {
+    display: block;
+  }
+
+  /* Style the indicator (dot/circle) */
+  .input-container .checkmark:after {
+    top: 9px;
+    left: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: white;
+  }
+
+  input#user-name {
+    width: 100%;
+}
+
+div#startModal {
+    max-width: 400px;
+}
+
+.radio-container {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+label.input-container.name-label {
+    justify-self: center;
+    padding-top: 1rem;
+    width: 80%;
+}
+
+.radio-container .input-container {
+    padding-left: 2rem;
 }
