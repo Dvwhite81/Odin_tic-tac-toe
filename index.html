@@ -9,10 +9,18 @@
 </head>
 <body>
     <div class="container">
-        <h1>Tic-Tac-Toe</h1>
-        <button id="startBtn">Start Game</button>
+        <button id="startBtn">Start</button>
 
-        <div class="gameboard"></div>
+        <div class="gameboard small"></div>
+
+        <!-- Modal -->
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h1 id="winner-heading"></h1>
+                <button class="new-game-btn">New Game</button>
+            </div>
+        </div>
     </div>
 </body>
 </html>

@@ -28,6 +28,20 @@ h1 {
     width: 25rem;
 }
 
+.small {
+    transition: all 1s ease-in-out;
+    transform: scale(0.0);
+    cursor: pointer;
+    z-index: 10;
+}
+
+.grow {
+    transition: all 1s ease-in-out;
+    transform: scale(1.0);
+    cursor: pointer;
+    z-index: 10;
+}
+
 .square {
     align-items: center;
     border: 1px solid black;
@@ -37,7 +51,68 @@ h1 {
     width: 100%;
 }
 
+.square:hover {
+    background-color: blue;
+    cursor: pointer;
+}
+
 .square img {
     height: 80%;
     width: 80%;
+}
+
+button#startBtn,
+.new-game-btn {
+    align-items: center;
+    background-color: green;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    font-size: 1rem;
+    font-weight: bold;
+    height: 4rem;
+    justify-self: center;
+    justify-content: center;
+    width: 4rem;
+}
+
+.modal {
+    background-color: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-self: center;
+    height: 100%;
+    position: fixed;
+    width: 50vw;
+    height: 50vh;
+    z-index: 10;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    border: 1px solid #888;
+    display: flex;
+    flex-direction: column;
+    height: 80%;
+    margin: auto;
+    width: 80%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.new-game-btn {
+    height: 5rem;
+    margin: auto;
+    width: 5rem;
 }
