@@ -3,68 +3,48 @@ const Player = (symbol) => {
 };
 
 const Gameboard = (() => {
-  let grid = ["X", "", "", "", "O", "", "", "", ""];
-  const htmlGrid = [];
-  const container = document.querySelector(".gameboard");
+  let grid = ["", "", "", "", "", "", "", "", ""];
+  const container = document.getElementById("gameboard");
 
   const getSymbol = (index, symbol) => {
+    let img = document.createElement("img");
+    img.className = "img-symbol";
+    img.id = index;
+
     if (symbol === "X") {
-      return `
-                <img id="${index}" src="./images/x-symbol.png">
-            `;
+      img.src = "./images/x-symbol.png";
+      return img;
     } else if (symbol === "O") {
-      return `
-                <img id="${index}" src="./images/o-symbol.png">
-            `;
+      img.src = "./images/o-symbol.png";
+      return img;
     } else return "";
   };
 
   const createBoard = () => {
-    let html = "";
-    grid.forEach((symbol, index) => {
+    container.innerHTML = "";
+
+    Gameboard.grid.forEach((symbol, index) => {
       const imgSymbol = getSymbol(index, symbol);
 
-      html += `
-                <div class="square" data-id="${index}">${imgSymbol}</div>
-            `;
-    });
-
-    container.innerHTML = html;
-
-    const squares = document.querySelectorAll(".square");
-    squares.forEach((square) => {
+      const square = document.createElement("div");
+      square.className = "square";
+      square.setAttribute("data-id", index);
       square.addEventListener("click", Game.addMark);
+      square.append(imgSymbol);
+      container.append(square);
     });
   };
 
-  const availableMoves = () => {
-    let open = [];
-    grid.forEach((space) => {
-      if (space === "") {
-        open.push(space);
-      }
-    });
-
-    return open;
-  };
-
-  const resetGrid = () => {
-    grid = ["X", "", "", "", "O", "", "", "", ""];
-  };
-
-  return { grid, createBoard, availableMoves, resetGrid };
+  return { grid, createBoard };
 })();
 
 const Game = (() => {
   let currentPlayer;
   console.log("Game", currentPlayer);
-  let gameOver = false;
 
   const start = () => {
     const human = Player("X");
-    console.log("human", human);
     const computer = Player("O");
-    players = [human, computer];
     currentPlayer = human;
 
     Gameboard.createBoard();
@@ -72,7 +52,7 @@ const Game = (() => {
 
   const checkWin = () => {
     let winner = "";
-    if (Gameboard.availableMoves().length === 0) {
+    if (Gameboard.grid.filter(elem => elem === '').length === 0) {
       winner = "Tie";
     }
 
@@ -100,16 +80,17 @@ const Game = (() => {
   const addMark = (e) => {
     const id = e.target.dataset.id;
 
-    Gameboard.grid[id] = currentPlayer;
+    if (Gameboard.grid[id] === "") {
+      Gameboard.grid[id] = currentPlayer;
+      currentPlayer = currentPlayer === "X" ? "O" : "X";
+    }
     Gameboard.createBoard();
-    currentPlayer = currentPlayer === "X" ? "O" : "X";
     checkWin();
   };
 
   const endGame = (winner) => {
-    // Draw a line?
-    Gameboard.resetGrid();
-    // Make a modal
+    Gameboard.grid = ["", "", "", "", "", "", "", "", ""];
+
     let msg = "";
     if (winner === "Tie") {
       msg = "It's a tie!";
@@ -117,49 +98,59 @@ const Game = (() => {
       msg = `${winner} wins!`;
     }
     Modal.openModal(msg);
+    winner = "";
   };
 
-  return { start, addMark };
+  const startGame = () => {
+    console.log("startGame", Gameboard.grid);
+    const startBtn = document.getElementById("startBtn");
+    startBtn.addEventListener("click", () => {
+      const container = document.querySelector(".gameboard");
+      container.classList.remove("small");
+      container.classList.add("grow");
+      startBtn.classList.add("small");
+      startBtn.remove();
+      Game.start();
+    });
+  };
+
+  const newGame = () => {
+    Modal.closeModal();
+    Game.start();
+  };
+
+  return { start, addMark, startGame, newGame };
 })();
 
-const startGame = () => {
-  const startBtn = document.getElementById("startBtn");
-  startBtn.addEventListener("click", () => {
-    const container = document.querySelector(".gameboard");
-    container.classList.remove("small");
-    container.classList.add("grow");
-    startBtn.classList.add("small");
-    startBtn.remove();
-    Game.start();
-  });
-};
-
 const Modal = (() => {
-    const popup = document.getElementById('myModal');
-    const span = document.getElementsByClassName("close")[0];
-    const newGameBtn = document.querySelector(".new-game-btn");
+  const popup = document.getElementById("myModal");
+  const span = document.getElementsByClassName("close")[0];
+  const newGameBtn = document.querySelector(".new-game-btn");
 
-    const openModal = (msg) => {
-      const h1 = document.getElementById("winner-heading");
-      h1.textContent = msg;
-      popup.style.display = "flex";
-    };
+  const openModal = (msg) => {
+    console.log("openModal", Gameboard.grid);
+    const h1 = document.getElementById("winner-heading");
+    h1.textContent = msg;
+    popup.classList.add("modal-flex");
+  };
 
-    const closeModal = (e, outsideClick) => {
-      if (outsideClick) {
-        if (e.target.classList.contains("modal-overlay")) {
-          popup.style.display = "none";
-        }
-      } else {
-        popup.style.display = "none";
+  const closeModal = (e, outsideClick) => {
+    if (outsideClick) {
+      if (e.target.classList.contains("modal")) {
+        popup.classList.remove("modal-flex");
+        popup.classList.add("modal-none");
+      }
+    } else {
+      popup.classList.remove("modal-flex");
+      popup.classList.add("modal-none");
     }
-    };
+  };
 
-    popup.addEventListener("click", (e) => closeModal(e, true));
-    span.addEventListener("click", closeModal);
-    newGameBtn.addEventListener("click", startGame);
+  popup.addEventListener("click", (e) => closeModal(e, true));
+  span.addEventListener("click", closeModal);
+  newGameBtn.addEventListener("click", Game.newGame);
 
-    return { openModal };
-  })();
+  return { openModal, closeModal };
+})();
 
-startGame();
+Game.startGame();

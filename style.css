@@ -116,3 +116,11 @@ button#startBtn,
     margin: auto;
     width: 5rem;
 }
+
+.modal-none {
+    display: none;
+}
+
+.modal-flex {
+    display: flex;
+}
