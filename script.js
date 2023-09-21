@@ -1,217 +1,313 @@
 const Player = (name, symbol) => {
-  return { name, symbol };
-};
-
-const Gameboard = (() => {
-  let grid = ["", "", "", "", "", "", "", "", ""];
-  const container = document.getElementById("gameboard");
-
-  const getSymbol = (index, symbol) => {
-    let img = document.createElement("img");
-    img.className = "img-symbol";
-    img.id = index;
-
-    if (symbol === "X") {
-      img.src = "./images/x-symbol.png";
-      return img;
-    } else if (symbol === "O") {
-      img.src = "./images/o-symbol.png";
-      return img;
-    } else return "";
+    return { name, symbol };
   };
 
-  const createBoard = () => {
-    container.innerHTML = "";
+  const CPU = (() => {
+    const validMoves = () => {
+      console.log("validmoves");
+      const indexes = [];
+      const grid = Gameboard.grid;
+      for (let i = 0; i < grid.length; i++) {
+        if (grid[i] === "") {
+          indexes.push(i);
+        }
+      }
+      return indexes;
+    };
 
-    Gameboard.grid.forEach((symbol, index) => {
-      const imgSymbol = getSymbol(index, symbol);
+    const randomMove = () => {
+      console.log("randommove");
+      const moves = validMoves();
+      const length = moves.length;
+      const random = Math.floor(Math.random() * length);
+      return moves[random];
+    };
 
-      const square = document.createElement("div");
-      square.className = "square";
-      square.setAttribute("data-id", index);
-      square.addEventListener("click", Game.addMark);
-      square.append(imgSymbol);
-      container.append(square);
-    });
-  };
+    const makeMove = () => {
+      console.log("makemove");
+      const move = CPU.randomMove();
+      Game.addMark(move);
+    };
 
-  const removeListeners = () => {
-    const squares = document.querySelectorAll(".square");
-    squares.forEach((square) =>
-      square.removeEventListener("click", Game.addMark)
-    );
-  };
+    return { validMoves, randomMove, makeMove };
+  })();
 
-  return { grid, createBoard, removeListeners };
-})();
+  const Gameboard = (() => {
+    let grid = ["", "", "", "", "", "", "", "", ""];
+    const container = document.getElementById("gameboard");
 
-const Game = (() => {
-  let currentPlayer;
-  let players;
+    const getSymbol = (index, symbol) => {
+      console.log("getsymbol");
+      let img = document.createElement("img");
+      img.className = "img-symbol";
+      img.id = index;
 
-  const setPlayers = (a, b) => {
-    players = [a, b];
-  };
+      if (symbol === "X") {
+        img.src = "./images/x-symbol.png";
+        return img;
+      } else if (symbol === "O") {
+        img.src = "./images/o-symbol.png";
+        return img;
+      } else return "";
+    };
 
-  const switchPlayers = () => {
-    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-  };
+    const createBoard = () => {
+      container.innerHTML = "";
 
-  const getPlayerName = () => {
-    return players[0];
-  };
+      Gameboard.grid.forEach((symbol, index) => {
+        const imgSymbol = getSymbol(index, symbol);
 
-  const start = (userName) => {
-    const popup = document.getElementById('startModal');
-    console.log('start - classlist:', popup.classList)
-    console.log('start')
-    const human = Player(userName, "X");
-    const computer = Player("The Computer", "O");
-    currentPlayer = human;
-    setPlayers(human, computer);
-    Gameboard.createBoard();
-  };
+        const square = document.createElement("div");
+        square.className = "square";
+        square.setAttribute("data-id", index);
+        square.append(imgSymbol);
+        container.append(square);
+      });
+    };
 
-  const checkWin = () => {
-    let winner = "";
-    if (Gameboard.grid.filter((elem) => elem === "").length === 0) {
-      winner = "Tie";
-    }
+    const addListeners = () => {
+      console.log("addListeners");
+      const squares = document.querySelectorAll(".square");
+      squares.forEach((square) => square.addEventListener("click", Game.getMove));
+    };
 
-    const g = Gameboard.grid;
-    // Horizontal
-    if (g[0] !== "" && g[0] === g[1] && g[1] === g[2]) winner = g[0];
-    if (g[3] !== "" && g[3] === g[4] && g[4] === g[5]) winner = g[3];
-    if (g[6] !== "" && g[6] === g[7] && g[7] === g[8]) winner = g[6];
+    const removeListeners = () => {
+      console.log("removeListeners");
+      const squares = document.querySelectorAll(".square");
+      squares.forEach((square) =>
+        square.removeEventListener("click", Game.getMove)
+      );
+    };
 
-    // Vertical
-    if (g[0] !== "" && g[0] === g[3] && g[3] === g[6]) winner = g[0];
-    if (g[1] !== "" && g[1] === g[4] && g[4] === g[7]) winner = g[1];
-    if (g[2] !== "" && g[2] === g[5] && g[5] === g[8]) winner = g[2];
+    return { grid, createBoard, addListeners, removeListeners };
+  })();
 
-    // Diagonal
-    if (g[0] !== "" && g[0] === g[4] && g[4] === g[8]) winner = g[0];
-    if (g[6] !== "" && g[6] === g[4] && g[4] === g[2]) winner = g[6];
+  const Game = (() => {
+    let currentPlayer;
+    let players;
+    let gameOver;
 
-    // End game
-    if (winner !== "") {
-      endGame(currentPlayer.name);
-    }
-  };
+    const setPlayers = (a, b) => {
+      console.log("setplayers");
+      players = [a, b];
+    };
 
-  const addMark = (e) => {
-    const id = e.target.dataset.id;
+    const switchPlayers = () => {
+      console.log("switchplayers");
+      currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
+      takeTurn();
+    };
 
-    if (Gameboard.grid[id] === "") {
+    const getPlayerName = (symbol) => {
+      console.log("getplayername");
+      const player = players.find((player) => player.symbol === symbol);
+      const name = player.name;
+      return name;
+    };
+
+    const start = (userName) => {
+      console.log("start");
+      const human = Player(userName, 'X');
+      const computer = Player("The Computer", 'O');
+      currentPlayer = human;
+      setPlayers(human, computer);
+      Gameboard.createBoard();
+      gameOver = false;
+      console.log("start - gameover", gameOver);
+      Game.takeTurn();
+    };
+
+    const checkWin = () => {
+      console.log("checkwin");
+      let winner = "";
+
+      const g = Gameboard.grid;
+      // Horizontal
+      if (g[0] !== "" && g[0] === g[1] && g[1] === g[2]) winner = g[0];
+      if (g[3] !== "" && g[3] === g[4] && g[4] === g[5]) winner = g[3];
+      if (g[6] !== "" && g[6] === g[7] && g[7] === g[8]) winner = g[6];
+      // Vertical
+      if (g[0] !== "" && g[0] === g[3] && g[3] === g[6]) winner = g[0];
+      if (g[1] !== "" && g[1] === g[4] && g[4] === g[7]) winner = g[1];
+      if (g[2] !== "" && g[2] === g[5] && g[5] === g[8]) winner = g[2];
+
+      // Diagonal
+      if (g[0] !== "" && g[0] === g[4] && g[4] === g[8]) winner = g[0];
+      if (g[6] !== "" && g[6] === g[4] && g[4] === g[2]) winner = g[6];
+
+      if (winner === "" && CPU.validMoves().length === 0) {
+        console.log("checkwin - tie");
+        winner = "Tie";
+      }
+
+      // End game
+      if (winner !== "") {
+        endGame(winner);
+      }
+    };
+
+    const addMark = (id) => {
+      console.log("addMark");
+
       Gameboard.grid[id] = currentPlayer.symbol;
       Gameboard.createBoard();
       checkWin();
-      switchPlayers();
-    } else {
-      alert("Choose an empty space");
-    }
-  };
+      if (!gameOver) {
+        switchPlayers();
+      }
+    };
 
-  const endGame = (winner) => {
-    console.log('endgame')
-    Gameboard.removeListeners();
-    Gameboard.grid = ["", "", "", "", "", "", "", "", ""];
+    const getMove = (e) => {
+      console.log("getmove");
+      const id = e.target.dataset.id;
+      if (Gameboard.grid[id] === "") {
+        Gameboard.grid[id] === currentPlayer.symbol;
+      } else {
+        alert("Choose an empty space");
+      }
 
-    let msg = "";
-    if (winner === "Tie") {
-      msg = "It's a tie!";
-    } else {
-      msg = `${winner} wins!`;
-    }
-    const modal = Modal("end");
-    modal.openModal("end", msg);
-    winner = "";
-  };
+      addMark(id);
+    };
 
-  const startGame = () => {
-    console.log('startgame')
-    const popup = document.getElementById('startModal');
-    console.log('startgame 1 - classlist:', popup.classList)
-    const startBtn = document.getElementById("start-btn");
-    startBtn.addEventListener("click", () => {
-      const modal = Modal("start");
-      modal.openModal("start");
-      const popup = document.getElementById('startModal');
-      console.log('startgame 2 - classlist:', popup.classList)
-      const startModal = document.getElementById('startModal');
+    const endGame = (winner) => {
+      console.log("endgame");
+      gameOver = true;
+      Gameboard.removeListeners();
+      Gameboard.grid = ["", "", "", "", "", "", "", "", ""];
+
+      let msg = "";
+      if (winner === "Tie") {
+        msg = "It's a tie!";
+      } else {
+        const name = Game.getPlayerName(winner);
+        msg = `${name} wins!`;
+      }
+      const modal = Modal("end");
+      modal.openModal("end", gameOver, msg);
+      winner = "";
+    };
+
+    const startGame = () => {
+      console.log("startgame");
+      const startBtn = document.getElementById("start-btn");
+      startBtn.addEventListener("click", () => {
+        const modal = Modal("start");
+        modal.openModal("start", gameOver);
+      });
+    };
+
+    const test1 = () => {
+      console.log("test1");
+      const userName = players[0].name;
+      return userName;
+    };
+
+    const test2 = () => {
+      console.log("test2");
+      const input = document.getElementById("user-name");
+      const userName = input.value;
+
+      const container = document.querySelector(".gameboard");
+      container.classList.remove("small");
+      container.classList.add("grow");
+      const startContainer = document.getElementById("start-container");
+      startContainer.classList.add("small");
+      startContainer.remove();
+
+      return userName;
+    };
+
+    const getUserName = async () => {
+      console.log("getusername");
+      let userName;
+
+      if (players !== undefined) {
+        console.log("getusername - if");
+        userName = await test1();
+      } else {
+        console.log("getusername - else");
+        userName = await test2();
+      }
+      Game.newGame(userName);
+    };
+
+    const newGame = (userName) => {
+      console.log("newgame");
+      const modal = Modal("end");
+      modal.closeModal();
+      Game.start(userName);
+    };
+
+    const takeTurn = () => {
+      console.log("taketurn");
+      if (currentPlayer.name === "The Computer") {
+        console.log("computer turn");
+        Gameboard.removeListeners();
+        setTimeout(() => {
+          CPU.makeMove();
+        }, "1000");
+      } else {
+        console.log("player turn");
+        Gameboard.addListeners();
+      }
+    };
+
+    return {
+      start,
+      addMark,
+      startGame,
+      newGame,
+      getUserName,
+      getPlayerName,
+      getMove,
+      takeTurn,
+      test1
+    };
+  })();
+
+  const Modal = (type) => {
+    const popup = document.getElementById(`${type}Modal`);
+    const span = document.querySelector(".close-modal-btn");
+    const startSubmitBtn = document.querySelector(".start-game-btn");
+    const endSubmitBtn = document.querySelector(".end-game-btn");
+
+    const openModal = (type, gameOver, msg) => {
+      console.log("openmodal - type", type);
+      console.log("openmodal - gameover", gameOver);
+      if (type === "start") {
+        // nothing
+      } else {
+        const h1 = document.getElementById(`${type}-heading`);
+        h1.textContent = msg;
+      }
+      popup.classList.add("grow");
+    };
+
+    const closeModal = () => {
+      console.log("closemodal");
+      popup.classList.remove("grow");
+    };
+
+    startSubmitBtn.addEventListener("click", () => {
+      closeModal();
+      console.log("listener - start");
+      Game.getUserName();
     });
+
+    endSubmitBtn.addEventListener("click", () => {
+      console.log("listener - end");
+      let userName = Game.test1();
+      console.log(userName)
+      Game.getUserName();
+
+    });
+
+    span.addEventListener("click", () => {
+      closeModal();
+      Game.getUserName();
+    });
+
+    return { openModal, closeModal };
   };
 
-  const getUserName = () => {
-    let popup = document.getElementById('startModal');
-    console.log('getusername 1 - classlist:', popup.classList)
-    console.log('players', players)
-
-    if (players !== undefined) {
-        let popup = document.getElementById('startModal');
-        console.log('getusername - 2 - classlist:', popup.classList)
-        console.log('players[0]', players[0])
-        console.log('players[0].name', players[0].name)
-        Game.newGame(players[0].name);
-    } else {
-        const input = document.getElementById("user-name");
-        const userName = input.value;
-        const container = document.querySelector(".gameboard");
-        container.classList.remove("small");
-        container.classList.add("grow");
-        const startContainer = document.getElementById("start-container");
-        startContainer.classList.add("small");
-        startContainer.remove();
-        let popup = document.getElementById('startModal');
-        console.log('getusername - 3 - classlist:', popup.classList)
-
-        Game.newGame(userName);
-        popup = document.getElementById('startModal');
-        console.log('getusername - 4 - classlist:', popup.classList)
-
-    }
-  };
-
-  const newGame = (userName) => {
-    console.log('newgame')
-    const modal = Modal("end");
-    modal.closeModal();
-    Game.start(userName);
-  };
-
-  return { start, addMark, startGame, newGame, getUserName, getPlayerName };
-})();
-
-const Modal = (type) => {
-  const popup = document.getElementById(`${type}Modal`);
-  const span = document.querySelector(".close-modal-btn");
-  const modalSubmitBtn = document.querySelector(`.${type}-game-btn`);
-
-  const openModal = (type, msg) => {
-    if (type === "start") {
-    } else {
-      const h1 = document.getElementById(`${type}-heading`);
-      h1.textContent = msg;
-    }
-    console.log('openmodal 1',popup.classList)
-    console.log('openmodal 2', popup.classList)
-
-
-    popup.classList.add('grow')
-    console.log('openmodal 3', popup.classList)
-
-  };
-
-  const closeModal = () => {
-    popup.classList.remove("grow");
-  };
-
-  modalSubmitBtn.addEventListener("click", () => {
-    closeModal();
-    Game.getUserName();
-  });
-
-  return { openModal, closeModal };
-};
-
-Game.startGame();
+  Game.startGame();
