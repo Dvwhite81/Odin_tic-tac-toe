@@ -19,6 +19,24 @@ h1 {
   width: 100vw;
 }
 
+/* Scoreboard container */
+#score-container {
+  flex-direction: column;
+  justify-self: center;
+  width: 50%;
+}
+
+#scoreboard-names,
+#scoreboard-scores {
+  display: flex;
+  justify-content: space-around;
+}
+
+#scoreboard-names {
+  text-decoration: underline;
+  text-underline-offset: 5px;
+}
+
 /* Gameboard container */
 .gameboard {
   align-items: center;
@@ -130,11 +148,11 @@ button#start-btn {
   width: 5rem;
 }
 
-.modal-none {
+.none {
   display: none;
 }
 
-.modal-flex {
+.flex {
   display: flex;
 }
 

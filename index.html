@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,31 +8,47 @@
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
 </head>
+
 <body>
     <div class="container">
         <div id="start-container">
             <h1>Welcome!</h1>
             <h2>Let's Play Tic-Tac-Toe</h2>
             <button id="start-btn">Start</button>
-</div>
+        </div>
+
+        <div id="score-container" class="none">
+            <h1 id="scoreboard-names">
+                <span id="player-name">
+                    You
+                </span>
+                <span id="cpu-name">
+                    CPU
+                </span>
+            </h1>
+            <h1 id="scoreboard-scores">
+                <span id="player-score"></span>
+                <span id="cpu-score"></span>
+            </h1>
+        </div>
 
         <div id="gameboard" class="gameboard small"></div>
 
         <!-- Modal -->
-        <div id="startModal" class="modal modal-flex small">
+        <div id="startModal" class="modal flex small">
             <div class="modal-content">
                 <div class="input-container">
                     <label class="input-container name-label">
                         Name?
                         <input class="input-container" type="text" name="user-name" id="user-name">
-                      </label>
+                    </label>
                 </div>
                 <div class="button-container">
                     <button class="start-game-btn">Play</button>
                 </div>
             </div>
         </div>
-        <div id="endModal" class="modal modal-flex small">
+        <div id="endModal" class="modal flex small">
             <div class="modal-content">
                 <span class="close-modal-btn">&times;</span>
                 <h1 id="end-heading"></h1>
@@ -40,4 +57,5 @@
         </div>
     </div>
 </body>
+
 </html>

@@ -3,16 +3,18 @@ const Player = (name, symbol) => {
   };
 
   const CPU = (() => {
+
     const validMoves = () => {
       console.log("validmoves");
-      const indexes = [];
+      const moves = [];
       const grid = Gameboard.grid;
-      for (let i = 0; i < grid.length; i++) {
+
+      for (let i = 0; i < 9; i++) {
         if (grid[i] === "") {
-          indexes.push(i);
+          moves.push(i);
         }
       }
-      return indexes;
+      return moves;
     };
 
     const randomMove = () => {
@@ -79,13 +81,38 @@ const Player = (name, symbol) => {
       );
     };
 
-    return { grid, createBoard, addListeners, removeListeners };
+    const getScoreboardElements = () => {
+      const playerScore = document.getElementById('player-score');
+      const cpuScore = document.getElementById('cpu-score');
+
+      return [playerScore, cpuScore];
+    }
+
+    const updateScoreboard = (scores) => {
+      const [playerScore, cpuScore] = getScoreboardElements();
+      playerScore.textContent = scores[0];
+      cpuScore.textContent = scores[1];
+    }
+
+    const setScoreboard = (scores) => {
+      const scoreboard = document.getElementById('score-container');
+      scoreboard.classList.add('flex');
+      scoreboard.classList.remove('none');
+
+      updateScoreboard(scores);
+    }
+
+    return { grid, createBoard, addListeners, removeListeners, getScoreboardElements, updateScoreboard, setScoreboard };
   })();
 
   const Game = (() => {
     let currentPlayer;
     let players;
     let gameOver;
+    let score = {
+      human: 0,
+      cpu: 0
+    };
 
     const setPlayers = (a, b) => {
       console.log("setplayers");
@@ -114,6 +141,7 @@ const Player = (name, symbol) => {
       Gameboard.createBoard();
       gameOver = false;
       console.log("start - gameover", gameOver);
+      Gameboard.setScoreboard([score['human'], score['cpu']]);
       Game.takeTurn();
     };
 
@@ -181,6 +209,13 @@ const Player = (name, symbol) => {
       } else {
         const name = Game.getPlayerName(winner);
         msg = `${name} wins!`;
+
+        if (name === 'The Computer') {
+          score['cpu']++;
+        } else {
+          score['human']++;
+        }
+        Gameboard.updateScoreboard([score['human'], score['cpu']])
       }
       const modal = Modal("end");
       modal.openModal("end", gameOver, msg);
@@ -199,6 +234,7 @@ const Player = (name, symbol) => {
     const test1 = () => {
       console.log("test1");
       const userName = players[0].name;
+
       return userName;
     };
 
@@ -213,6 +249,8 @@ const Player = (name, symbol) => {
       const startContainer = document.getElementById("start-container");
       startContainer.classList.add("small");
       startContainer.remove();
+
+      Gameboard.setScoreboard([0, 0]);
 
       return userName;
     };
@@ -252,6 +290,20 @@ const Player = (name, symbol) => {
       }
     };
 
+
+    const winningCombos = () => {
+      const combos = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [6, 4, 2]
+    ]
+    }
+
     return {
       start,
       addMark,
@@ -261,7 +313,8 @@ const Player = (name, symbol) => {
       getPlayerName,
       getMove,
       takeTurn,
-      test1
+      test1,
+      winningCombos
     };
   })();
 
