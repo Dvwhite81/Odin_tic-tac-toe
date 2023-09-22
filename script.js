@@ -35,6 +35,8 @@ const CPU = (() => {
     let xMoves = [];
     let oMoves = [];
     let wins = false;
+    let winner = null;
+
     for (let i = 0; i < 8; i++) {
       let combo = winCombos[i];
       let row = [grid[combo[0]], grid[combo[1]], grid[combo[2]]];
@@ -241,19 +243,9 @@ const Game = (() => {
     //console.log("checkwin");
     let winner = "";
 
-    const g = Gameboard.grid;
-    // Horizontal
-    if (g[0] !== "" && g[0] === g[1] && g[1] === g[2]) winner = g[0];
-    if (g[3] !== "" && g[3] === g[4] && g[4] === g[5]) winner = g[3];
-    if (g[6] !== "" && g[6] === g[7] && g[7] === g[8]) winner = g[6];
-    // Vertical
-    if (g[0] !== "" && g[0] === g[3] && g[3] === g[6]) winner = g[0];
-    if (g[1] !== "" && g[1] === g[4] && g[4] === g[7]) winner = g[1];
-    if (g[2] !== "" && g[2] === g[5] && g[5] === g[8]) winner = g[2];
-
-    // Diagonal
-    if (g[0] !== "" && g[0] === g[4] && g[4] === g[8]) winner = g[0];
-    if (g[6] !== "" && g[6] === g[4] && g[4] === g[2]) winner = g[6];
+    if (CPU.checkBoard()['wins']) {
+      winner = currentPlayer.symbol;
+    }
 
     if (winner === "" && CPU.validMoves().length === 0) {
       //console.log("checkwin - tie");
